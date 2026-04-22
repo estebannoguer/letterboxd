@@ -1,0 +1,29 @@
+name: Letterboxd × JustWatch Sync
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'  # Every Monday at 10am Argentina time (UTC-3)
+  workflow_dispatch:        # Allow manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests gspread google-auth
+
+      - name: Run sync
+        env:
+          LB_CSRF: ${{ secrets.LB_CSRF }}
+          LB_SESSION: ${{ secrets.LB_SESSION }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        run: python letterboxd_justwatch.py
